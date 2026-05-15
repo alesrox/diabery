@@ -1,0 +1,45 @@
+erDiagram
+    USER ||--o{ FOOD : "creates"
+    USER ||--o{ ENTRY : "logs"
+    ENTRY ||--|{ ENTRY_FOOD : "contains"
+    FOOD ||--o{ ENTRY_FOOD : "is included in"
+
+    USER {
+        bigint id PK
+        string name
+        string email
+        string password
+        float insulin_sensitivity_factor "FSI - mg/dL drop per 1 unit"
+        float carb_insulin_ratio "Units per carb ration"
+        integer grams_per_ration "Grams of CH in 1 ration (e.g. 10g)"
+        integer target_glucose "Desired glucose level (e.g. 110)"
+    }
+
+    FOOD {
+        bigint id PK
+        bigint user_id FK
+        string name
+        float carbs_100g
+    }
+
+    ENTRY {
+        bigint id PK
+        bigint user_id FK
+        datetime entry_at "Timestamp of the meal"
+        string meal_type "Breakfast, Lunch, Dinner, Snack, etc."
+        integer glucose_pre
+        integer glucose_post "Measured after 2:30h"
+        float meal_bolus "Insulin for the food"
+        float correction_bolus "Insulin for high glucose correction"
+        float total_carbs_sum "Total calculated carbs"
+        text notes
+        float suggested_adjustment "Calculated correction for future reference"
+    }
+
+    ENTRY_FOOD {
+        bigint id PK
+        bigint entry_id FK
+        bigint food_id FK
+        float weight_grams "How much was eaten"
+        float calculated_carbs "Carbs for this specific portion"
+    }
