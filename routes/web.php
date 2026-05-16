@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EntryController;
 use App\Http\Controllers\FoodController;
 use Illuminate\Support\Facades\Route;
@@ -12,7 +13,10 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [EntryController::class, 'index'])->name('dashboard');
+    Route::get('/', [EntryController::class, 'index'])->name('dashboard');
     Route::resource('entries', EntryController::class);
     Route::resource('foods', FoodController::class);
+
+    Route::get('/settings', [ProfileController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings', [ProfileController::class, 'update'])->name('settings.update');
 });
