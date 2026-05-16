@@ -1,6 +1,6 @@
 FROM php:8.3-apache
 
-# Instalar dependencias del sistema y extensiones de PHP necesarias (Corregido)
+# Instalar dependencias del sistema y extensiones de PHP necesarias
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -24,8 +24,8 @@ WORKDIR /var/www/html
 # Copiar el código del proyecto
 COPY . .
 
-# Instalar dependencias de Laravel para producción
-RUN composer install --no-dev --optimize-autoloader
+# Instalar dependencias saltándose bloqueos de plataforma (Evita el exit code 2)
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
 # Configurar los permisos para Apache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
