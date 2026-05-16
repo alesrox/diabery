@@ -12,7 +12,6 @@
         .app-container { 
             max-width: 80%; 
             margin: 0 auto; 
-            /* Usamos variables de Bootstrap para que cambie de color automáticamente */
             background-color: var(--bs-card-bg); 
             border-radius: 15px;
         }
@@ -26,7 +25,6 @@
         }
 
         .entry-card { 
-            /* Se adapta al color del borde según el tema de Bootstrap */
             border: 1px solid var(--bs-border-color); 
             border-radius: 16px; 
             transition: all 0.2s;
@@ -61,7 +59,6 @@
             font-weight: 700; 
         }
 
-        /* Ajustes para pantallas mini */
         @media (max-width: 380px) {
             .card-body { padding: 10px !important; }
             .ms-3 { margin-left: 8px !important; }
