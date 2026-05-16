@@ -29,7 +29,7 @@
     "Dashboard": "Panel de Control",
     "Carb Ratio": "Ratio CH",
     "Sensitivity": "Sensibilidad",
-    "Today's entries": "Registros de hoy",
+    "Dashboard's entries": "Registros",
     "No entries today": "No hay registros hoy",
     "MEASURE NOW!": "¡MEDIR YA!",
     "MEASURE": "MEDIR",
@@ -61,7 +61,7 @@
     "Total Insulin": "Insulina Total",
     "Notes or details": "Notas o detalles",
     "Ej: Comida fuera de casa, poca actividad...": "Ej: Comida fuera de casa, poca actividad...",
-    "Log and Calculate Insulin": "Registrar y Calcular Insulina",
+    "Log and Calculate Insulin": "Añadir entrada",
 
     "Add": "Añadir",
     "Settings": "Ajustes",

@@ -102,7 +102,7 @@
             </div>
         </div>
 
-        <h5 class="fw-bold mb-3 px-1">{{ __("Today's entries") }}</h5>
+        <h5 class="fw-bold mb-3 px-1">{{ __("Dashboard's entries") }}</h5>
         
         @forelse($entries as $entry)
             @php
@@ -162,8 +162,9 @@
                                     {{ __($entry->meal_type->value) }}
                                 </span>
                                 <small class="text-muted" style="font-size: 0.75rem;">
-                                    {{ \Carbon\Carbon::parse($entry->entry_at, 'UTC')->setTimezone(request()
-                                        ->cookie('timezone', 'Europe/Madrid'))->format('H:i') }}
+                                    {{ \Carbon\Carbon::parse($entry->entry_at, 'UTC')
+                                        ->setTimezone(request()->cookie('timezone', 'Europe/Madrid'))
+                                        ->isoFormat('D [de] MMMM, H:mm') }}
                                 </small>
                             </div>
                             <div class="small text-muted">
