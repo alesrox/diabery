@@ -152,11 +152,16 @@
                                 <span class="fw-bold text-capitalize text-truncate me-1 text-body">
                                     {{ __($entry->meal_type->value) }}
                                 </span>
-                                <small class="text-muted" style="font-size: 0.75rem;">{{ \Carbon\Carbon::parse($entry->entry_at, 'UTC')->setTimezone('Europe/Madrid')->format('H:i') }}</small>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    {{ \Carbon\Carbon::parse($entry->entry_at, 'UTC')->setTimezone(request()
+                                        ->cookie('timezone', 'Europe/Madrid'))->format('H:i') }}
+                                </small>
                             </div>
                             <div class="small text-muted">
                                 <strong>{{ $entry->total_carbs_sum }}g</strong> CH · 
-                                <span class="text-primary fw-bold">{{ number_format($entry->meal_bolus + $entry->correction_bolus, 1) }}u</span>
+                                <span class="text-primary fw-bold">
+                                    {{ number_format((float)$entry->meal_bolus + (float)$entry->correction_bolus, 1) }}u
+                                </span>
                             </div>
                         </div>
 

@@ -24,7 +24,12 @@
             @csrf
 
             <div class="row g-3 mb-4">
-                <div class="col-md-6">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-body-secondary small">{{ __('Date and Time') }}</label>
+                    <input type="datetime-local" name="entry_at" class="form-control form-control-lg" 
+                        value="{{ \Carbon\Carbon::now('Europe/Madrid')->format('Y-m-d\TH:i') }}" required>
+                </div>
+                <div class="col-md-4">
                     <label class="form-label fw-bold text-body-secondary small">{{ __('Time of day') }}</label>
                     <select name="meal_type" class="form-select form-select-lg">
                         @foreach(\App\Enums\MealType::cases() as $type)
@@ -32,7 +37,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label fw-bold text-body-secondary small">{{ __('Pre-meal Glucose') }}</label>
                     <div class="input-group input-group-lg">
                         <input type="number" name="glucose_pre" class="form-control" placeholder="100">

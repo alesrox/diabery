@@ -69,5 +69,10 @@
     "Logout": "Logout",
     "New Record": "New Record",
     "New Food Entry": "New Food Entry",
-    "Add Food to Dictionary": "Add Food to Dictionary"
+    "Add Food to Dictionary": "Add Food to Dictionary",
+
+    "Delete Entry": "Delete Entry",
+    "Are you sure you want to delete this entry?": "Are you sure you want to delete this entry?",
+    "Date and Time": "Date and Time",
+    "Timezone": "Timezone"
 }

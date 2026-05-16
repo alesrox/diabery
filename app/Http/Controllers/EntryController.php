@@ -6,6 +6,8 @@ use App\Models\Food;
 use App\Models\Entry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cookie;
 
 class EntryController extends Controller {
     public function index(Request $request) {
@@ -37,6 +39,7 @@ class EntryController extends Controller {
 
     public function store(Request $request) {
         $validated = $request->validate([
+            'entry_at' => 'required|date',
             'meal_type' => 'required|string',
             'glucose_pre' => 'nullable|numeric',
             'meal_bolus' => 'nullable|numeric',
@@ -46,14 +49,17 @@ class EntryController extends Controller {
             'foods' => 'nullable|array', 
         ]);
 
+        $userTimezone = Cookie::get('timezone', 'Europe/Madrid');
+        $localDate = Carbon::createFromFormat('Y-m-d\TH:i', $request->entry_at, $userTimezone);
+
         $entry = Auth::user()->entries()->create([
+            'entry_at' => $localDate->setTimezone('UTC'),
             'meal_type' => $validated['meal_type'],
             'glucose_pre' => $validated['glucose_pre'] ?? 0,
             'meal_bolus' => $validated['meal_bolus'] ?? 0,
             'correction_bolus' => $validated['correction_bolus'] ?? 0,
             'total_carbs_sum' => $validated['total_carbs_sum'],
             'notes' => $validated['notes'],
-            'entry_at' => now(),
         ]);
 
         if ($request->has('foods')) {
@@ -80,14 +86,34 @@ class EntryController extends Controller {
 
     public function update(Request $request, Entry $entry) {
         $validated = $request->validate([
+            'entry_at' => 'required|date',
+            'meal_type' => 'required',
             'glucose_pre' => 'nullable|numeric',
             'glucose_post' => 'nullable|numeric',
             'meal_bolus' => 'nullable|numeric',
             'correction_bolus' => 'nullable|numeric',
+            'total_carbs_sum' => 'required|numeric',
             'notes' => 'nullable|string',
         ]);
 
+        $userTimezone = Cookie::get('timezone', 'Europe/Madrid'); 
+        $localDate = Carbon::createFromFormat('Y-m-d\TH:i', $request->entry_at, $userTimezone);
+        $validated['entry_at'] = $localDate->setTimezone('UTC');
+
+        $validated['glucose_pre'] = $request->filled('glucose_pre') ? $request->glucose_pre : null;
+        $validated['glucose_post'] = $request->filled('glucose_post') ? $request->glucose_post : null;
+        $validated['meal_bolus'] = $request->filled('meal_bolus') ? $request->meal_bolus : null;
+        $validated['correction_bolus'] = $request->filled('correction_bolus') ? $request->correction_bolus : null;
+
         $entry->update($validated);
-        return redirect()->route('dashboard')->with('success', 'Registro actualizado');
+        $foodsData = $request->input('foods', []);
+        $entry->foods()->sync($foodsData);
+        return redirect()->route('dashboard')->with('success', 'Registro actualizado con éxito');
+    }
+
+    public function destroy(Entry $entry) {
+        $entry->foods()->detach();
+        $entry->delete();
+        return redirect()->route('dashboard')->with('success', __('Entry deleted successfully'));
     }
 }

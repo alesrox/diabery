@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         body { background-color: var(--bs-body-bg); }
-        .app-container { max-width: 80%; margin: 0 auto; padding: 0 0 10px 0; background-color: var(--bs-card-bg); border-radius: 15px; }
+        .app-container { max-width: 80%; margin: 20px auto; padding: 0 0 10px 0; background-color: var(--bs-card-bg); border-radius: 15px; }
         .food-card { border-left: 4px solid #198754; background-color: var(--bs-card-bg); border-top: 1px solid var(--bs-border-color); border-right: 1px solid var(--bs-border-color); border-bottom: 1px solid var(--bs-border-color); }
     </style>
 </head>
@@ -26,32 +26,70 @@
             @method('PUT')
 
             <div class="row g-3 mb-4">
-                <div class="col-6">
-                    <label class="form-label fw-bold text-body-secondary small">{{ __('PRE GLUCOSE') }}</label>
-                    <input type="number" name="glucose_pre" class="form-control form-control-lg" value="{{ $entry->glucose_pre }}">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-body-secondary small">{{ __('Date and Time') }}</label>
+                    <input type="datetime-local" name="entry_at" class="form-control form-control-lg" 
+                    value="{{ \Carbon\Carbon::parse($entry->entry_at)->timezone(request()->cookie('timezone', 'Europe/Madrid'))->format('Y-m-d\TH:i') }}" required>
                 </div>
-                <div class="col-6">
-                    <label class="form-label fw-bold text-primary small">{{ __('POST GLUCOSE') }}</label>
-                    <input type="number" name="glucose_post" class="form-control form-control-lg border-primary" value="{{ $entry->glucose_post }}" placeholder="{{ __('Pending') }}">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-body-secondary small">{{ __('Time of day') }}</label>
+                    <select name="meal_type" class="form-select form-select-lg">
+                        @foreach(\App\Enums\MealType::cases() as $type)
+                            <option value="{{ $type->value }}" {{ $entry->meal_type->value == $type->value ? 'selected' : '' }}>
+                                {{ ucfirst(__($type->value)) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-body-secondary small">{{ __('Pre-meal Glucose') }}</label>
+                    <div class="input-group input-group-lg">
+                        <input type="number" name="glucose_pre" class="form-control" value="{{ $entry->glucose_pre }}">
+                        <span class="input-group-text">mg/dL</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4 col-6">
+                    <label class="form-label fw-bold text-primary small">{{ __('Meal Insulin') }}</label>
+                    <div class="input-group">
+                        <input type="number" step="0.5" name="meal_bolus" class="form-control form-control-lg" value="{{ $entry->meal_bolus }}">
+                        <span class="input-group-text">u</span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <label class="form-label fw-bold text-danger small">{{ __('Correction Insulin') }}</label>
+                    <div class="input-group">
+                        <input type="number" step="0.5" name="correction_bolus" class="form-control form-control-lg" value="{{ $entry->correction_bolus }}">
+                        <span class="input-group-text">u</span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <label class="form-label fw-bold text-success small">{{ __('POST GLUCOSE') }}</label>
+                    <div class="input-group">
+                        <input type="number" name="glucose_post" class="form-control form-control-lg border-success" value="{{ $entry->glucose_post }}" placeholder="{{ __('Pending') }}">
+                        <span class="input-group-text">mg/dL</span>
+                    </div>
                 </div>
             </div>
 
             <div class="card mb-4 border-0 bg-body-tertiary">
                 <div class="card-body">
-                    <label class="form-label fw-bold small text-body-secondary">{{ __('ADD MORE FOODS') }}</label>
+                    <label class="form-label fw-bold small text-body-secondary"><i class="bi bi-search me-1"></i> {{ __('ADD MORE FOODS') }}</label>
                     <div class="row g-2">
                         <div class="col-8">
                             <select id="foodSelector" class="form-select">
                                 <option value="">{{ __('Select...') }}</option>
                                 @foreach($foods as $food)
-                                    <option value="{{ $food->id }}" data-carbs="{{ $food->carbs_100g }}">{{ $food->name }}</option>
+                                    <option value="{{ $food->id }}" data-carbs="{{ $food->carbs_100g }}">{{ $food->name }} ({{ $food->carbs_100g }}g/100g)</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col-4">
                             <div class="input-group">
                                 <input type="number" id="foodWeight" class="form-control" placeholder="g">
-                                <button type="button" onclick="addFoodToList()" class="btn btn-dark"><i class="bi bi-plus"></i></button>
+                                <button type="button" onclick="addFoodToList()" class="btn btn-primary"><i class="bi bi-plus"></i></button>
                             </div>
                         </div>
                     </div>
@@ -60,9 +98,9 @@
 
             <div id="selectedFoodsList" class="list-group mb-4">
                 @foreach($entry->foods as $f)
-                <div class="list-group-item d-flex justify-content-between align-items-center food-card mb-2 shadow-sm rounded">
+                <div class="list-group-item d-flex justify-content-between align-items-center food-card mb-2 shadow-sm rounded text-body">
                     <div>
-                        <strong class="text-capitalize text-body">{{ $f->name }}</strong><br>
+                        <strong class="text-capitalize">{{ $f->name }}</strong><br>
                         <small class="text-body-secondary">{{ $f->pivot->weight_grams }}g | {{ $f->pivot->calculated_carbs }}g CH</small>
                         <input type="hidden" name="foods[{{ $f->id }}][weight_grams]" value="{{ $f->pivot->weight_grams }}">
                         <input type="hidden" name="foods[{{ $f->id }}][calculated_carbs]" value="{{ $f->pivot->calculated_carbs }}">
@@ -74,14 +112,38 @@
                 @endforeach
             </div>
 
-            <div class="bg-primary text-white p-3 rounded-4 d-flex justify-content-between align-items-center mb-4">
-                <span class="fw-bold">{{ __('Total Carbs:') }}</span>
-                <span class="fs-3 fw-bold"><span id="totalCarbsLabel">{{ $entry->total_carbs_sum }}</span>g</span>
-                <input type="hidden" name="total_carbs_sum" id="total_carbs_sum" value="{{ $entry->total_carbs_sum }}">
+            <div class="d-flex justify-content-between align-items-center p-3 bg-dark text-white rounded shadow-sm mb-4">
+                <div>
+                    <div class="small opacity-75">{{ __('Total Carbs:') }}</div>
+                    <span class="fs-4 fw-bold"><span id="totalCarbsLabel">{{ $entry->total_carbs_sum }}</span>g</span>
+                    <input type="hidden" name="total_carbs_sum" id="total_carbs_sum" value="{{ $entry->total_carbs_sum }}">
+                </div>
+                <div class="text-end">
+                    <div class="small opacity-75">{{ __('Total Insulin') }}</div>
+                    <span class="fs-4 fw-bold text-info"><span id="totalInsulinDisplay">0.0</span>u</span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold text-body-secondary small">{{ __('Notes or details') }}</label>
+                <textarea name="notes" class="form-control" rows="2" placeholder="{{ __('Ej: Comida fuera de casa, poca actividad...') }}">{{ $entry->notes }}</textarea>
             </div>
 
             <button type="submit" class="btn btn-success btn-lg w-100 py-3 fw-bold shadow">{{ __('Save Changes') }}</button>
         </form>
+        <hr class="my-4 border-secondary opacity-25">
+
+        <div class="d-flex justify-content-center">
+            <form action="{{ route('entries.destroy', $entry) }}" method="POST" 
+                onsubmit="return confirm('{{ __('Are you sure you want to delete this entry?') }}');" 
+                class="w-100">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-outline-danger w-100 py-2 fw-semibold shadow-sm">
+                    <i class="bi bi-trash3 me-2"></i> {{ __('Delete Entry') }}
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -94,17 +156,19 @@
         if (!selector.value || !weightInput.value) return;
 
         const foodId = selector.value;
-        const foodName = selector.options[selector.selectedIndex].text;
+        const foodName = selector.options[selector.selectedIndex].text.split('(')[0];
         const carbs100g = parseFloat(selector.options[selector.selectedIndex].dataset.carbs);
         const weight = parseFloat(weightInput.value);
         const calculatedCarbs = (weight * carbs100g) / 100;
 
+        const emptyMsg = document.getElementById('emptyMessage');
+        if (emptyMsg) emptyMsg.remove();
+
         const item = document.createElement('div');
-        // Añadida la clase 'text-body' para asegurar consistencia cromática al inyectar HTML vía JS
         item.className = "list-group-item d-flex justify-content-between align-items-center food-card mb-2 shadow-sm rounded text-body";
         item.innerHTML = `
             <div>
-                <strong>${foodName}</strong><br>
+                <strong class="text-capitalize">${foodName}</strong><br>
                 <small class="text-body-secondary">${weight}g | ${calculatedCarbs.toFixed(1)}g CH</small>
                 <input type="hidden" name="foods[${foodId}][weight_grams]" value="${weight}">
                 <input type="hidden" name="foods[${foodId}][calculated_carbs]" value="${calculatedCarbs.toFixed(1)}">
@@ -117,13 +181,31 @@
     }
 
     function updateTotals() {
+        const list = document.getElementById('selectedFoodsList');
+        const carbInputs = list.querySelectorAll('input[name*="calculated_carbs"]');
+        
         let total = 0;
-        document.querySelectorAll('input[name*="calculated_carbs"]').forEach(input => {
+        carbInputs.forEach(input => {
             total += parseFloat(input.value);
         });
+        
         document.getElementById('totalCarbsLabel').innerText = total.toFixed(1);
         document.getElementById('total_carbs_sum').value = total.toFixed(1);
+
+        const mealBolus = parseFloat(document.querySelector('input[name="meal_bolus"]').value) || 0;
+        const correctionBolus = parseFloat(document.querySelector('input[name="correction_bolus"]').value) || 0;
+        const totalInsulin = mealBolus + correctionBolus;
+        document.getElementById('totalInsulinDisplay').innerText = totalInsulin.toFixed(1);
+
+        if (carbInputs.length === 0 && !document.getElementById('emptyMessage')) {
+            list.innerHTML = `<p class="text-muted small text-center py-3" id="emptyMessage">{{ __('No foods added yet.') }}</p>`;
+        }
     }
+
+    document.querySelector('input[name="meal_bolus"]').addEventListener('input', updateTotals);
+    document.querySelector('input[name="correction_bolus"]').addEventListener('input', updateTotals);
+
+    document.addEventListener("DOMContentLoaded", updateTotals);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

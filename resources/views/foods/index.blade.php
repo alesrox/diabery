@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         body { background-color: #f8f9fa; }
-        .app-container { max-width: 80%; margin: 0 auto; padding: 0 0 10px 0; background: white; border-radius: 15px; }
+        .app-container { max-width: 80%; margin: 20px auto; padding: 0 0 10px 0; background: white; border-radius: 15px; }
     </style>
 </head>
 <body>

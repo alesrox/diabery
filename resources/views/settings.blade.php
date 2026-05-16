@@ -76,12 +76,14 @@
                             <option value="en">{{ __('English') }}</option>
                         </select>
                     </div>
-                    <!-- <div class="col-md-6 mb-3 d-flex align-items-center pt-4">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="darkModeSwitch">
-                            <label class="form-check-label fw-semibold ms-2" for="darkModeSwitch">{{ __('Enable Dark Mode') }}</label>
-                        </div>
-                    </div> -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">{{ __('Timezone') }}</label>
+                        <select id="timezoneSelect" class="form-select">
+                            @foreach(\DateTimeZone::listIdentifiers() as $tz)
+                                <option value="{{ $tz }}">{{ str_replace('_', ' ', $tz) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -95,8 +97,9 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const languageSelect = document.getElementById('languageSelect');
-        const htmlElement = document.documentElement;
+        const timezoneSelect = document.getElementById('timezoneSelect');
 
+        // --- LÓGICA PARA EL IDIOMA ---
         const savedLang = localStorage.getItem('lang');
         if (savedLang) {
             languageSelect.value = savedLang;
@@ -112,6 +115,25 @@
                 window.location.href = window.location.pathname;
             }, 50);
         });
+
+        const savedTimezone = localStorage.getItem('timezone') || getCookie('timezone') || "Europe/Madrid";
+        timezoneSelect.value = savedTimezone;
+
+        timezoneSelect.addEventListener('change', function() {
+            const selectedTimezone = this.value;
+            localStorage.setItem('timezone', selectedTimezone);
+            document.cookie = `timezone=${selectedTimezone}; expires=${new Date(Date.now() + 365*24*60*60*1000).toUTCString()}; path=/; SameSite=Lax`;
+            setTimeout(() => {
+                window.location.reload();
+            }, 50);
+        });
+
+        function getCookie(name) {
+            let matches = document.cookie.match(new RegExp(
+                "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+            ));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
     });
 </script>
 
