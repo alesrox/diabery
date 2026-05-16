@@ -1,4 +1,4 @@
-<nav class="navbar bg-primary shadow-sm mb-4" data-bs-theme="dark">
+<nav class="navbar bg-primary shadow-sm mb-4">
     <div class="container-fluid px-4"> 
         
         <a class="navbar-brand fw-bold d-flex align-items-center text-white" href="{{ route('dashboard') }}">

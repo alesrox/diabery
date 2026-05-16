@@ -76,12 +76,12 @@
                             <option value="en">{{ __('English') }}</option>
                         </select>
                     </div>
-                    <div class="col-md-6 mb-3 d-flex align-items-center pt-4">
+                    <!-- <div class="col-md-6 mb-3 d-flex align-items-center pt-4">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="darkModeSwitch">
                             <label class="form-check-label fw-semibold ms-2" for="darkModeSwitch">{{ __('Enable Dark Mode') }}</label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -95,10 +95,8 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const languageSelect = document.getElementById('languageSelect');
-        const darkModeSwitch = document.getElementById('darkModeSwitch');
         const htmlElement = document.documentElement;
 
-        // --- CONTROL DE IDIOMA ---
         const savedLang = localStorage.getItem('lang');
         if (savedLang) {
             languageSelect.value = savedLang;
@@ -113,21 +111,6 @@
             setTimeout(() => {
                 window.location.href = window.location.pathname;
             }, 50);
-        });
-
-        // --- CONTROL DE MODO OSCURO ---
-        if (htmlElement.getAttribute('data-bs-theme') === 'dark') {
-            darkModeSwitch.checked = true;
-        }
-
-        darkModeSwitch.addEventListener('change', function() {
-            if (this.checked) {
-                htmlElement.setAttribute('data-bs-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                htmlElement.setAttribute('data-bs-theme', 'light');
-                localStorage.setItem('theme', 'light');
-            }
         });
     });
 </script>
