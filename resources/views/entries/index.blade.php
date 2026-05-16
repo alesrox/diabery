@@ -74,10 +74,19 @@
 <body>
 
 @include('components.navbar')
-
 <div class="app-container shadow-sm pb-5">
     <div class="p-3 p-md-4">
-        
+        @if(session('init'))
+        <a href="{{ route('settings.edit') }}" class="text-decoration-none">
+            <div class="alert alert-info alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+                <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                <div>
+                    {{ session('init') }}
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </a>
+        @endif
         <div class="row g-2 mb-4">
             <div class="col-6">
                 <div class="p-3 bg-body-tertiary rounded-3 text-center border">

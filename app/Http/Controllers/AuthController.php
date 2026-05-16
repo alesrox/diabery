@@ -16,7 +16,7 @@ class AuthController extends Controller {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|confirmed',
         ]);
 
         $user = User::create([
@@ -32,7 +32,7 @@ class AuthController extends Controller {
 
         Auth::login($user);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard')->with('init', 'Por favor, actualiza tu información en la sección de ajustes.');
     }
 
     public function showLogin() {
@@ -50,7 +50,7 @@ class AuthController extends Controller {
             return redirect()->intended('dashboard');
         }
 
-        return back()->withErrors(['email' => 'The provided credentials do not match our records.']);
+        return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->withInput();
     }
 
     public function logout(Request $request) {

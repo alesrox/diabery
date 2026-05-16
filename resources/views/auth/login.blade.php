@@ -18,7 +18,8 @@
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" required>
+                    <input type="email" name="email" class="form-control" 
+                        value="{{ old('email') }}" required>
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Contraseña</label>
@@ -26,6 +27,9 @@
                 </div>
                 <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Entrar</button>
             </form>
+            <div class="text-center mt-3 small">
+                ¿No tienes cuenta? <a href="/register">Registrate</a>
+            </div>
             @if ($errors->any())
                 <div class="alert alert-danger mt-3 small">
                     {{ $errors->first() }}
