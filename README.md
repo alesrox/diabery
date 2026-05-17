@@ -1,3 +1,5 @@
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+
 # Diabery
 
 Diabery is a specialized web application built on the Laravel framework, designed to function as an historical logbook for meal-specific insulin dosing. The platform focuses strictly on correlation analysis between dietary intake, administered insulin dosages, and subsequent blood glucose outcomes. By maintaining an accurate record of these variables, users can review historical trends to make informed decisions regarding optimal insulin-to-carbohydrate ratios for recurring meals.
