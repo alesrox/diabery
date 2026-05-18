@@ -16,6 +16,10 @@
             border-radius: 15px;
         }
 
+        @media (max-width: 992px) {
+            .app-container { max-width: 95%; }
+        }
+
         @media (min-width: 768px) {
             .app-container {
                 margin-top: 20px;
@@ -36,9 +40,9 @@
         }
 
         .status-badge-container {
-            width: 38px;
-            height: 38px;
-            border-radius: 20px;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -48,7 +52,7 @@
         .text-orange { color: #fd7e14 !important; }
 
         .glucose-box { 
-            min-width: 45px; 
+            min-width: 55px; 
             text-align: center; 
         }
 
@@ -59,12 +63,14 @@
             font-weight: 700; 
         }
 
-        @media (max-width: 380px) {
-            .card-body { padding: 10px !important; }
-            .ms-3 { margin-left: 8px !important; }
-            .ps-3 { padding-left: 8px !important; }
-            .glucose-box { min-width: 35px; }
-            .status-badge-container { width: 30px; margin-right: 10px !important; }
+        .linea-movil {
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+
+        @media (min-width: 576px) {
+            .linea-movil {
+                border-bottom: none !important;
+            }
         }
     </style>
 </head>
@@ -147,50 +153,60 @@
 
             <a href="{{ route('entries.edit', $entry) }}" class="text-decoration-none text-dark d-block mb-3">
                 <div class="card entry-card {{ $cardBorder }}" style="border-width: 2px;">
-                    <div class="card-body d-flex align-items-center p-3">
+                    <div class="card-body p-3">
                         
-                        <div class="status-badge-container me-3 {{ $statusBg }}" style="width: 45px; height: 45px; border-radius: 12px;">
-                            <i class="bi {{ $statusIcon }} {{ $iconColor }} fs-4"></i>
-                        </div>
-
-                        <div class="flex-grow-1 overflow-hidden">
-                            <div class="d-flex align-items-baseline">
-                                <span class="fw-bold text-capitalize text-truncate me-1 text-body">
-                                    {{ __($entry->meal_type->value) }}
-                                </span>
-                                <small class="text-muted" style="font-size: 0.75rem;">
-                                    {{ \Carbon\Carbon::parse($entry->entry_at, 'UTC')
-                                        ->setTimezone(request()->cookie('timezone', 'Europe/Madrid'))
-                                        ->isoFormat('D [de] MMMM, H:mm') }}
-                                </small>
-                            </div>
-                            <div class="small text-muted">
-                                <strong>{{ $entry->total_carbs_sum }}g</strong> CH · 
-                                <span class="text-primary fw-bold">
-                                    {{ number_format((float)$entry->meal_bolus + (float)$entry->correction_bolus, 1) }}u
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="ms-3 d-flex align-items-center border-start ps-3">
-                            <div class="glucose-box me-3">
-                                <div class="fw-bold fs-5 text-body">{{ $entry->glucose_pre }}</div>
-                                <div class="label-muted">PRE</div>
+                        <div class="d-flex flex-column d-sm-flex flex-sm-row align-items-start align-items-sm-center">
+                            
+                            <div class="d-flex align-items-center mb-3 mb-sm-0 me-sm-3">
+                                <div class="status-badge-container me-3 {{ $statusBg }}">
+                                    <i class="bi {{ $statusIcon }} {{ $iconColor }} fs-4"></i>
+                                </div>
+                                
+                                <div class="overflow-hidden">
+                                    <span class="fw-bold text-capitalize text-truncate text-body fs-5 fs-sm-6 d-block lh-sm">
+                                        {{ __($entry->meal_type->value) }}
+                                    </span>
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem; white-space: nowrap;">
+                                        {{ \Carbon\Carbon::parse($entry->entry_at, 'UTC')
+                                            ->setTimezone(request()->cookie('timezone', 'Europe/Madrid'))
+                                            ->isoFormat('D [de] MMMM, H:mm') }}
+                                    </small>
+                                </div>
                             </div>
 
-                            <div class="glucose-box">
-                                @if($hasPost)
-                                    <div class="fw-bold fs-5 {{ $postColor }}">{{ $entry->glucose_post }}</div>
-                                    <div class="label-muted">POST</div>
-                                @elseif($isLate)
-                                    <span class="badge bg-warning text-dark py-1 px-2" style="font-size: 0.65rem;">{{ __('MEASURE NOW!') }}</span>
-                                @else
-                                    <span class="badge rounded-pill bg-body text-primary border border-primary-subtle py-1 px-2" style="font-size: 0.6rem;">{{ __('MEASURE') }}</span>
-                                @endif
+                            <div class="mb-3 mb-sm-0 me-sm-auto ps-0 ps-sm-2 w-100 w-sm-auto pb-2 pb-sm-0 linea-movil">
+                                <div class="label-muted d-block d-sm-none mb-1">{{ __('Nutrients & Insulin') }}</div>
+                                <div class="fs-6 text-muted">
+                                    <strong class="text-body">{{ $entry->total_carbs_sum }}g</strong> CH · 
+                                    <span class="text-primary fw-bold">
+                                        {{ number_format((float)$entry->meal_bolus + (float)$entry->correction_bolus, 1) }}u
+                                    </span>
+                                </div>
                             </div>
-                        </div>
 
-                    </div>
+                            <div class="d-flex align-items-center justify-content-between justify-content-sm-end w-100 w-sm-auto pt-2 pt-sm-0 ps-sm-3 border-sm-start">
+                                <div class="label-muted d-block d-sm-none">{{ __('Blood Glucose') }}</div>
+                                
+                                <div class="d-flex align-items-center">
+                                    <div class="glucose-box me-4 me-sm-3">
+                                        <div class="fw-bold fs-4 fs-sm-5 text-body">{{ $entry->glucose_pre }}</div>
+                                        <div class="label-muted">PRE</div>
+                                    </div>
+
+                                    <div class="glucose-box">
+                                        @if($hasPost)
+                                            <div class="fw-bold fs-4 fs-sm-5 {{ $postColor }}">{{ $entry->glucose_post }}</div>
+                                            <div class="label-muted">POST</div>
+                                        @elseif($isLate)
+                                            <span class="badge bg-warning text-dark py-1 px-2" style="font-size: 0.65rem;">{{ __('MEASURE NOW!') }}</span>
+                                        @else
+                                            <span class="badge rounded-pill bg-body text-primary border border-primary-subtle py-1 px-2" style="font-size: 0.6rem;">{{ __('MEASURE') }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div> </div>
                 </div>
             </a>
         @empty
