@@ -36,6 +36,6 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return redirect()->route('settings.edit')->with('success', '¡Ajustes guardados correctamente!');
+        return redirect()->route('settings.edit')->with('success', __('settings.updated'));
     }
 }

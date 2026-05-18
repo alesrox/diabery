@@ -74,5 +74,8 @@
     "Delete Entry": "Eliminar Registro",
     "Are you sure you want to delete this entry?": "¿Estás seguro de que deseas eliminar este registro?",
     "Date and Time": "Fecha y Hora",
-    "Timezone": "Zona horaria"
+    "Timezone": "Zona horaria",
+
+    "settings.updated": "¡Ajustes guardados correctamente!",
+    "messages.update_profile": "Por favor, actualiza tu información en la sección de ajustes."
 }

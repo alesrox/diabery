@@ -74,5 +74,8 @@
     "Delete Entry": "Delete Entry",
     "Are you sure you want to delete this entry?": "Are you sure you want to delete this entry?",
     "Date and Time": "Date and Time",
-    "Timezone": "Timezone"
+    "Timezone": "Timezone",
+
+    "settings.updated": "Settings saved successfully!",
+    "messages.update_profile": "Please, update your information in the settings section."
 }

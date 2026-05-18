@@ -32,7 +32,7 @@ class AuthController extends Controller {
 
         Auth::login($user);
 
-        return redirect()->route('dashboard')->with('init', 'Por favor, actualiza tu información en la sección de ajustes.');
+        return redirect()->route('dashboard')->with('init', __('messages.update_profile'));
     }
 
     public function showLogin() {
