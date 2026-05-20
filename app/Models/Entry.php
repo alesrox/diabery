@@ -28,7 +28,7 @@ class Entry extends Model
     public function foods()
     {
         return $this->belongsToMany(Food::class, 'entry_food', 'entry_id', 'food_id')
-                    ->withPivot('quantity', 'measure_type', 'calculated_carbs')
+                    ->withPivot('quantity', 'calculated_carbs')
                     ->withTimestamps();
     }
 }

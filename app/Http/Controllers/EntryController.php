@@ -55,8 +55,8 @@ class EntryController extends Controller {
             'entry_at' => $localDate->setTimezone('UTC'),
             'meal_type' => $validated['meal_type'] ?? "breakfast",
             'glucose_pre' => $validated['glucose_pre'] ?: Auth::user()->target_glucose,
-            'meal_bolus' => $validated['meal_bolus'] ?? 0,
-            'correction_bolus' => $validated['correction_bolus'] ?? 0,
+            'meal_bolus' => $validated['meal_bolus'] ?: 0,
+            'correction_bolus' => $validated['correction_bolus'] ?: 0,
             'total_carbs_sum' => $validated['total_carbs_sum'],
             'notes' => $validated['notes'],
         ]);
@@ -79,7 +79,6 @@ class EntryController extends Controller {
     public function edit(Entry $entry) {
         $foods = auth()->user()->foods()->orderBy('name')->get();
         $entry->load('foods'); 
-        
         return view('entries.edit', compact('entry', 'foods'));
     }
 
@@ -99,13 +98,21 @@ class EntryController extends Controller {
         $localDate = Carbon::createFromFormat('Y-m-d\TH:i', $request->entry_at, $userTimezone);
         $validated['entry_at'] = $localDate->setTimezone('UTC');
 
-        $validated['glucose_pre'] = $request->filled('glucose_pre') ? $request->glucose_pre : null;
+        $validated['glucose_pre'] = $request->filled('glucose_pre') ? $request->glucose_pre : Auth::user()->target_glucose;
         $validated['glucose_post'] = $request->filled('glucose_post') ? $request->glucose_post : null;
-        $validated['meal_bolus'] = $request->filled('meal_bolus') ? $request->meal_bolus : null;
-        $validated['correction_bolus'] = $request->filled('correction_bolus') ? $request->correction_bolus : null;
+        $validated['meal_bolus'] = $request->filled('meal_bolus') ? $request->meal_bolus : 0;
+        $validated['correction_bolus'] = $request->filled('correction_bolus') ? $request->correction_bolus : 0;
 
         $entry->update($validated);
-        $foodsData = $request->input('foods', []);
+        $foodsData = [];
+        $rawFoods = $request->input('foods', []);
+        foreach ($rawFoods as $foodId => $pivotData) {
+            $foodsData[$foodId] = [
+                'quantity' => $pivotData['quantity'],
+                'calculated_carbs' => $pivotData['calculated_carbs'],
+            ];
+        }
+        
         $entry->foods()->sync($foodsData);
         return redirect()->route('dashboard')->with('success', 'Registro actualizado con éxito');
     }

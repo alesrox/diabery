@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('New Entry') }} - Diabery</title>
+    <title>{{ __('Edit Entry') }} - Diabery</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         body { background-color: var(--bs-body-bg); }
         .app-container { max-width: 80%; margin: 20px auto; padding: 0 0 10px 0; background-color: var(--bs-card-bg); border-radius: 15px; }
         .food-card { border-left: 4px solid #198754; background-color: var(--bs-card-bg); border-top: 1px solid var(--bs-border-color); border-right: 1px solid var(--bs-border-color); border-bottom: 1px solid var(--bs-border-color); }
+        .border-orange { border-color: #fd7e14 !important; }
     </style>
 </head>
 <body>
@@ -17,24 +18,23 @@
 <div class="app-container shadow-sm mt-md-4">
     <div class="p-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold m-0 text-body">{{ __('New Entry') }}</h2>
+            <h2 class="fw-bold m-0 text-body">{{ __('Edit Entry') }}</h2>
             <a href="{{ route('dashboard') }}" class="btn-close"></a>
         </div>
 
-        <form action="{{ route('entries.store') }}" method="POST">
+        <form action="{{ route('entries.update', $entry) }}" method="POST">
             @csrf
-
-            <div class="row g-3 mb-4">
+            @method('PUT') <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <label class="form-label fw-bold text-body-secondary small">{{ __('Date and Time') }}</label>
                     <input type="datetime-local" name="entry_at" class="form-control form-control-lg" 
-                    value="{{ \Carbon\Carbon::now()->timezone(request()->cookie('timezone', 'Europe/Madrid'))->format('Y-m-d\TH:i') }}" required>
+                    value="{{ \Carbon\Carbon::parse($entry->entry_at)->timezone(request()->cookie('timezone', 'Europe/Madrid'))->format('Y-m-d\TH:i') }}" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-bold text-body-secondary small">{{ __('Time of day') }}</label>
                     <select name="meal_type" class="form-select form-select-lg">
                         @foreach(\App\Enums\MealType::cases() as $type)
-                            <option value="{{ $type->value }}">
+                            <option value="{{ $type->value }}" {{ $entry->meal_type->value == $type->value ? 'selected' : '' }}>
                                 {{ ucfirst(__($type->value)) }}
                             </option>
                         @endforeach
@@ -43,7 +43,7 @@
                 <div class="col-md-4">
                     <label class="form-label fw-bold text-body-secondary small">{{ __('Pre-meal Glucose') }}</label>
                     <div class="input-group input-group-lg">
-                        <input type="number" name="glucose_pre" class="form-control" placeholder="0">
+                        <input type="number" name="glucose_pre" class="form-control" value="{{ $entry->glucose_pre }}">
                         <span class="input-group-text">mg/dL</span>
                     </div>
                 </div>
@@ -53,21 +53,42 @@
                 <div class="col-md-4 col-6">
                     <label class="form-label fw-bold text-primary small">{{ __('Meal Insulin') }}</label>
                     <div class="input-group">
-                        <input type="number" step="0.5" name="meal_bolus" class="form-control form-control-lg" placeholder="0.0">
+                        <input type="number" step="0.5" name="meal_bolus" class="form-control form-control-lg" value="{{ $entry->meal_bolus }}">
                         <span class="input-group-text">u</span>
                     </div>
                 </div>
                 <div class="col-md-4 col-6">
                     <label class="form-label fw-bold text-danger small">{{ __('Correction Insulin') }}</label>
                     <div class="input-group">
-                        <input type="number" step="0.5" name="correction_bolus" class="form-control form-control-lg" placeholder="0.0">
+                        <input type="number" step="0.5" name="correction_bolus" class="form-control form-control-lg" value="{{ $entry->correction_bolus }}">
                         <span class="input-group-text">u</span>
                     </div>
                 </div>
                 <div class="col-md-4 col-12">
                     <label class="form-label fw-bold small text-body-secondary">{{ __('POST GLUCOSE') }}</label>
-                    <div class="input-group">
-                        <input type="number" name="glucose_post" class="form-control form-control-lg border-secondary" placeholder="{{ __('Pending') }}">
+                    <div class="input-group input-group-lg">
+                        @php
+                            $postBorderClass = 'border-secondary';
+
+                            if (!is_null($entry->glucose_post)) {
+                                $postValue = (int)$entry->glucose_post;
+
+                                if ($postValue < 70) {
+                                    $postBorderClass = 'border-danger';
+                                } elseif ($postValue <= 180) {
+                                    $postBorderClass = 'border-success';
+                                } elseif ($postValue <= 239) {
+                                    $postBorderClass = 'border-warning';
+                                } else {
+                                    $postBorderClass = 'text-orange border-orange';
+                                }
+                            }
+                        @endphp
+                        <input type="number" 
+                            name="glucose_post" 
+                            class="form-control form-control-lg {{ $postBorderClass }}" 
+                            value="{{ $entry->glucose_post }}" 
+                            placeholder="{{ __('Pending') }}">
                         <span class="input-group-text">mg/dL</span>
                     </div>
                 </div>
@@ -75,7 +96,7 @@
 
             <div class="card mb-4 border-0 bg-body-tertiary">
                 <div class="card-body">
-                    <label class="form-label fw-bold small text-body-secondary"><i class="bi bi-search me-1"></i> {{ __('ADD FOODS') }}</label>
+                    <label class="form-label fw-bold small text-body-secondary"><i class="bi bi-search me-1"></i> {{ __('ADD MORE FOODS') }}</label>
                     <div class="row g-2">
                         <div class="col-8">
                             <select id="foodSelector" class="form-select" onchange="updatePlaceholder()">
@@ -103,14 +124,36 @@
             </div>
 
             <div id="selectedFoodsList" class="list-group mb-4">
+                @forelse($entry->foods as $f)
+                <div class="list-group-item d-flex justify-content-between align-items-center food-card mb-2 shadow-sm rounded text-body">
+                    <div>
+                        <strong class="text-capitalize">{{ $f->name }}</strong><br>
+                        <small class="text-body-secondary">
+                            @if($f->pivot->measure_type == 'units')
+                                {{ $f->pivot->quantity }}u | {{ $f->pivot->calculated_carbs }}g CH
+                            @else
+                                {{ (int)$f->pivot->quantity }}g | {{ $f->pivot->calculated_carbs }}g CH
+                            @endif
+                        </small>
+                        
+                        <input type="hidden" name="foods[{{ $f->id }}][quantity]" value="{{ $f->pivot->quantity }}">
+                        <input type="hidden" name="foods[{{ $f->id }}][measure_type]" value="{{ $f->pivot->measure_type }}">
+                        <input type="hidden" name="foods[{{ $f->id }}][calculated_carbs]" value="{{ $f->pivot->calculated_carbs }}">
+                    </div>
+                    <button type="button" class="btn btn-sm text-danger" onclick="this.parentElement.remove(); updateTotals();">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+                @empty
                 <p class="text-muted small text-center py-3" id="emptyMessage">{{ __('No foods added yet.') }}</p>
+                @endforelse
             </div>
 
             <div class="d-flex justify-content-between align-items-center p-3 bg-dark text-white rounded shadow-sm mb-4">
                 <div>
                     <div class="small opacity-75">{{ __('Total Carbs:') }}</div>
-                    <span class="fs-4 fw-bold"><span id="totalCarbsLabel">0.0</span>g CH</span>
-                    <input type="hidden" name="total_carbs_sum" id="total_carbs_sum" value="0">
+                    <span class="fs-4 fw-bold"><span id="totalCarbsLabel">{{ $entry->total_carbs_sum }}</span>g CH</span>
+                    <input type="hidden" name="total_carbs_sum" id="total_carbs_sum" value="{{ $entry->total_carbs_sum }}">
                 </div>
                 <div class="text-end">
                     <div class="small opacity-75">{{ __('Total Insulin') }}</div>
@@ -120,16 +163,29 @@
 
             <div class="mb-4">
                 <label class="form-label fw-bold text-body-secondary small">{{ __('Notes or details') }}</label>
-                <textarea name="notes" class="form-control" rows="2" placeholder="{{ __('Ej: Comida fuera de casa, poca actividad...') }}"></textarea>
+                <textarea name="notes" class="form-control" rows="2" placeholder="{{ __('Ej: Comida fuera de casa, poca actividad...') }}">{{ $entry->notes }}</textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow">{{ __('Create Entry') }}</button>
+            <button type="submit" class="btn btn-success btn-lg w-100 py-3 fw-bold shadow">{{ __('Save Changes') }}</button>
         </form>
+
+        <hr class="my-4 border-secondary opacity-25">
+
+        <div class="d-flex justify-content-center">
+            <form action="{{ route('entries.destroy', $entry) }}" method="POST" 
+                onsubmit="return confirm('{{ __('Are you sure you want to delete this entry?') }}');" 
+                class="w-100">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-outline-danger w-100 py-2 fw-semibold shadow-sm">
+                    <i class="bi bi-trash3 me-2"></i> {{ __('Delete Entry') }}
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
-// Modifica dinámicamente el placeholder del input según el tipo de medida
 function updatePlaceholder() {
     const selector = document.getElementById('foodSelector');
     const weightInput = document.getElementById('foodWeight');
