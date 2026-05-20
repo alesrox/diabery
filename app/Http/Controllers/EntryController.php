@@ -11,25 +11,24 @@ use Illuminate\Support\Facades\Cookie;
 
 class EntryController extends Controller {
     public function index(Request $request) {
-        $query = auth()->user()->entries()->with('foods');
+        $user = auth()->user();
 
-        if ($request->has('meal_type') && $request->meal_type != '') {
-            $query->where('meal_type', $request->meal_type);
-        }
+        $userFoods = $user->foods()->select('id', 'name')->get();
 
-        if ($request->has('search') && $request->search != '') {
-            $searchTerm = $request->search;
-            $query->where(function($q) use ($searchTerm) {
-                $q->where('notes', 'like', "%{$searchTerm}%")
-                ->orWhereHas('foods', function($f) use ($searchTerm) {
-                    $f->where('name', 'like', "%{$searchTerm}%");
-                });
+        $query = $user->entries();
+
+        $query->when($request->filled('date'), function ($q) use ($request) {
+            $q->whereDate('entry_at', $request->date);
+        });
+
+        $query->when($request->filled('food'), function ($q) use ($request) {
+            $q->whereHas('foods', function($subQuery) use ($request) {
+                $subQuery->where('foods.id', $request->food);
             });
-        }
+        });
 
-        $entries = $query->orderBy('entry_at', 'desc')->get();
-
-        return view('entries.index', compact('entries'));
+        $entries = $query->latest('entry_at')->get();
+        return view('entries.index', compact('entries', 'userFoods'));
     }
 
     public function create() {
@@ -41,7 +40,7 @@ class EntryController extends Controller {
         $validated = $request->validate([
             'entry_at' => 'required|date',
             'meal_type' => 'required|string',
-            'glucose_pre' => 'nullable|numeric',
+            'glucose_pre' => 'numeric',
             'meal_bolus' => 'nullable|numeric',
             'correction_bolus' => 'nullable|numeric',
             'total_carbs_sum' => 'required|numeric',
@@ -54,8 +53,8 @@ class EntryController extends Controller {
 
         $entry = Auth::user()->entries()->create([
             'entry_at' => $localDate->setTimezone('UTC'),
-            'meal_type' => $validated['meal_type'],
-            'glucose_pre' => $validated['glucose_pre'] ?? 0,
+            'meal_type' => $validated['meal_type'] ?? "breakfast",
+            'glucose_pre' => $validated['glucose_pre'] ?: Auth::user()->target_glucose,
             'meal_bolus' => $validated['meal_bolus'] ?? 0,
             'correction_bolus' => $validated['correction_bolus'] ?? 0,
             'total_carbs_sum' => $validated['total_carbs_sum'],
@@ -66,7 +65,7 @@ class EntryController extends Controller {
             $pivotData = [];
             foreach ($request->foods as $foodId => $data) {
                 $pivotData[$foodId] = [
-                    'weight_grams' => $data['weight_grams'],
+                    'quantity' => $data['quantity'],
                     'calculated_carbs' => $data['calculated_carbs'],
                 ];
             }
@@ -74,7 +73,7 @@ class EntryController extends Controller {
             $entry->foods()->attach($pivotData);
         }
 
-        return redirect()->route('dashboard')->with('success', 'Entrada registrada correctamente.');
+        return redirect()->route('dashboard')->with('init', __('messages.new_entry'));
     }
 
     public function edit(Entry $entry) {

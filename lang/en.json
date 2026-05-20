@@ -3,6 +3,7 @@
     "Food Name": "Food Name",
     "e.g. Pasta": "e.g. Pasta",
     "Carbs (per 100g)": "Carbs (per 100g)",
+    "Carbs (per 1 single unit)": "Carbs (per 1 single unit)",
     "Add to my list": "Add to my list",
     "ratios": "ratios",
     "Are you sure you want to delete this food?": "Are you sure you want to delete this food?",
@@ -31,7 +32,6 @@
     "Sensitivity": "Sensitivity",
     "Dashboard's entries": "Entries",
     "No entries today": "No entries today",
-    "MEASURE NOW!": "MEASURE NOW!",
     "MEASURE": "MEASURE",
     "breakfast": "breakfast",
     "lunch": "lunch",
@@ -77,5 +77,6 @@
     "Timezone": "Timezone",
 
     "settings.updated": "Settings saved successfully!",
-    "messages.update_profile": "Please, update your information in the settings section."
+    "messages.update_profile": "Please, update your information in the settings section.",
+    "messages.new_entry": "Entry successfully registered."
 }

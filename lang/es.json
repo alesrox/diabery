@@ -3,6 +3,7 @@
     "Food Name": "Nombre del Alimento",
     "e.g. Pasta": "ej. Pasta",
     "Carbs (per 100g)": "Carbohidratos (por 100g)",
+    "Carbs (per 1 single unit)": "Carbohidratos (por 1 unidad)",
     "Add to my list": "Añadir a mi lista",
     "ratios": "raciones",
     "Are you sure you want to delete this food?": "¿Borrar este alimento?",
@@ -31,7 +32,6 @@
     "Sensitivity": "Sensibilidad",
     "Dashboard's entries": "Registros",
     "No entries today": "No hay registros hoy",
-    "MEASURE NOW!": "¡MEDIR YA!",
     "MEASURE": "MEDIR",
     "breakfast": "desayuno",
     "lunch": "almuerzo",
@@ -51,7 +51,7 @@
     "Time of day": "Momento del día",
     "Pre-meal Glucose": "Glucosa Pre-comida",
     "Meal Insulin": "Insulina Comida",
-    "Correction Insulin": "Insulina Corrección",
+    "Correction Insulin": "Corrección",
     "Add Foods": "Añadir Alimentos",
     "Select a food...": "Selecciona un alimento...",
     "Gramos": "Gramos",
@@ -77,5 +77,6 @@
     "Timezone": "Zona horaria",
 
     "settings.updated": "¡Ajustes guardados correctamente!",
-    "messages.update_profile": "Por favor, actualiza tu información en la sección de ajustes."
+    "messages.update_profile": "Por favor, actualiza tu información en la sección de ajustes.",
+    "messages.new_entry": "Entrada registrada correctamente."
 }

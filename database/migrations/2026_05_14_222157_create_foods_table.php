@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->float('carbs_100g');
+            $table->string('measure_type')->default('grams');
+            $table->float('quantity');
             $table->timestamps();
         });
     }

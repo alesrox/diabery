@@ -19,7 +19,7 @@ erDiagram
         bigint id PK
         bigint user_id FK
         string name
-        float carbs_100g
+        float quantity
     }
 
     ENTRY {
@@ -40,6 +40,7 @@ erDiagram
         bigint id PK
         bigint entry_id FK
         bigint food_id FK
-        float weight_grams "How much was eaten"
+        string measure_type "grams or units";
+        float quantity "How much was eaten"
         float calculated_carbs "Carbs for this specific portion"
     }

@@ -21,17 +21,29 @@
             <div class="card-body">
                 <form action="{{ route('foods.store') }}" method="POST">
                     @csrf
-                    <div class="mb-2">
-                        <label class="small fw-bold">{{ __('Food Name') }}</label>
-                        <input type="text" name="name" class="form-control" placeholder="{{ __('e.g. Pasta') }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="small fw-bold">{{ __('Carbs (per 100g)') }}</label>
-                        <div class="input-group">
-                            <input type="number" step="0.1" name="carbs_100g" class="form-control" placeholder="0.0" required>
-                            <span class="input-group-text">g</span>
+                    <div class="row g-2 mb-3">
+                        <div class="col-12 col-sm-6">
+                            <label class="small fw-bold">{{ __('Food Name') }}</label>
+                            <input type="text" name="name" class="form-control" placeholder="{{ __('e.g. Pasta') }}" required>
+                        </div>
+                        
+                        <div class="col-12 col-sm-6">
+                            <label class="small fw-bold">{{ __('Measurement Type') }}</label>
+                            <select name="measure_type" id="main_measure" class="form-select" onchange="updateLabels()">
+                                <option value="grams">{{ __('Grams (g)') }}</option>
+                                <option value="units">{{ __('Units (uds)') }}</option>
+                            </select>
                         </div>
                     </div>
+
+                    <div class="mb-3">
+                        <label class="small fw-bold" id="label_carbs">{{ __('Carbs (per 100g)') }}</label>
+                        <div class="input-group">
+                            <input type="number" step="0.1" name="quantity" id="input_carbs" class="form-control" placeholder="0.0" required>
+                            <span class="input-group-text" id="addon_carbs">g</span>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100 fw-bold">{{ __('Add to my list') }}</button>
                 </form>
             </div>
@@ -42,11 +54,21 @@
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <div>
                         <span class="fw-bold text-capitalize">{{ $food->name }}</span>
-                        <div class="small text-muted">{{ $food->carbs_100g }}g CH / 100g</div>
+                        <div class="small text-muted mt-1">
+                            <span>
+                                <i class="bi bi-box-seam me-1"></i>
+                                {{ $food->quantity }}g CH / 
+                                @if($food->measure_type == 'units')
+                                    {{ __('unit') }}
+                                @else
+                                    100g
+                                @endif
+                            </span>
+                        </div>
                     </div>
                     <div class="d-flex align-items-center">
                         <span class="badge bg-info rounded-pill text-dark me-2">
-                            {{ $food->carbs_100g / 10 }} {{ __('ratios') }}
+                            {{ number_format($food->quantity / 10, 1) }} {{ __('ratios') }}
                         </span>
                         
                         <form action="{{ route('foods.destroy', $food) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this food?') }}')">
@@ -65,6 +87,22 @@
         </ul>
     </div>
 </div>
+
+<script>
+function updateLabels() {
+    const measure = document.getElementById('main_measure').value;
+    const labelCarbs = document.getElementById('label_carbs');
+    const addonCarbs = document.getElementById('addon_carbs');
+
+    if (measure === 'grams') {
+        labelCarbs.innerText = "{{ __('Carbs (per 100g)') }}";
+        addonCarbs.innerText = "g";
+    } else {
+        labelCarbs.innerText = "{{ __('Carbs (per 1 single unit)') }}";
+        addonCarbs.innerText = "g / {{ __('unit') }}";
+    }
+}
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -27,19 +27,19 @@ class DatabaseSeeder extends Seeder
         $pasta = Food::create([
             'user_id' => $user->id,
             'name' => 'Pasta Integral',
-            'carbs_100g' => 70,
+            'quantity' => 70,
         ]);
 
         $manzana = Food::create([
             'user_id' => $user->id,
             'name' => 'Manzana',
-            'carbs_100g' => 14,
+            'quantity' => 14,
         ]);
 
         $pan = Food::create([
             'user_id' => $user->id,
             'name' => 'Pan de Centeno',
-            'carbs_100g' => 45,
+            'quantity' => 45,
         ]);
 
         $oldEntry = Entry::create([
@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
             'notes' => 'Comida en casa de mi abuela',
         ]);
 
-        $oldEntry->foods()->attach($pasta->id, ['weight_grams' => 70, 'calculated_carbs' => 49]);
+        $oldEntry->foods()->attach($pasta->id, ['quantity' => 70, 'calculated_carbs' => 49]);
 
         $recentEntry = Entry::create([
             'user_id' => $user->id,
@@ -64,6 +64,6 @@ class DatabaseSeeder extends Seeder
             'meal_bolus' => 4,
             'total_carbs_sum' => 30,
         ]);
-        $recentEntry->foods()->attach($pan->id, ['weight_grams' => 60, 'calculated_carbs' => 27]);
+        $recentEntry->foods()->attach($pan->id, ['quantity' => 60, 'calculated_carbs' => 27]);
     }
 }

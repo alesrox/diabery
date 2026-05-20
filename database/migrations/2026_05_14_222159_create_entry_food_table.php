@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('entry_food', function (Blueprint $table) {
             $table->id();
             $table->foreignId('entry_id')->constrained('entries')->onDelete('cascade');
-    $table->foreignId('food_id')->constrained('foods')->onDelete('cascade');
-            $table->float('weight_grams');
+            $table->foreignId('food_id')->constrained('foods')->onDelete('cascade');
+            $table->decimal('quantity', 8, 2)->default(0);
             $table->float('calculated_carbs');
             $table->timestamps();
         });

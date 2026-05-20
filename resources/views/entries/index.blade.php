@@ -67,6 +67,12 @@
             border-bottom: 1px solid var(--bs-border-color);
         }
 
+        @media (max-width: 575.98px) {
+            .btn-filtrar-movil {
+                width: 100%;
+            }
+        }
+
         @media (min-width: 576px) {
             .linea-movil {
                 border-bottom: none !important;
@@ -90,6 +96,7 @@
             </div>
         </a>
         @endif
+        
         <div class="row g-2 mb-4">
             <div class="col-6">
                 <div class="p-3 bg-body-tertiary rounded-3 text-center border">
@@ -102,6 +109,42 @@
                     <div class="label-muted mb-1">{{ __('Sensitivity') }}</div>
                     <span class="fw-bold fs-5 text-primary">{{ auth()->user()->insulin_sensitivity_factor }}</span>
                 </div>
+            </div>
+        </div>
+
+        <div class="card bg-body-tertiary border border-light-subtle rounded-3 mb-4">
+            <div class="card-body p-3">
+                <form method="GET" action="{{ route('dashboard') }}">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-12 col-sm-4">
+                            <label class="label-muted mb-1 d-block" for="filter_date">{{ __('Date') }}</label>
+                            <input type="date" name="date" id="filter_date" class="form-control form-control-sm bg-body" value="{{ request('date') }}">
+                        </div>
+                        
+                        <div class="col-12 col-sm-5">
+                            <label class="label-muted mb-1 d-block" for="filter_food">{{ __('Select Food') }}</label>
+                            <select name="food" id="filter_food" class="form-select form-select-sm bg-body">
+                                <option value="">{{ __('All foods') }}</option>
+                                @foreach($userFoods as $food)
+                                    <option value="{{ $food->id }}" {{ request('food') == $food->id ? 'selected' : '' }}>
+                                        {{ $food->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-sm-3 d-flex gap-1 justify-content-end">
+                            @if(request()->filled('date') || request()->filled('food'))
+                                <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary flex-grow-1 flex-sm-grow-0" title="{{ __('Clear filters') }}">
+                                    <i class="bi bi-x-circle"></i>
+                                </a>
+                            @endif
+                            <button type="submit" class="btn btn-sm btn-primary btn-filtrar-movil flex-grow-1 flex-sm-grow-0">
+                                <i class="bi bi-funnel-fill me-1"></i>{{ __('Filter') }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -198,7 +241,7 @@
                                             <div class="fw-bold fs-4 fs-sm-5 {{ $postColor }}">{{ $entry->glucose_post }}</div>
                                             <div class="label-muted">POST</div>
                                         @elseif($isLate)
-                                            <span class="badge bg-warning text-dark py-1 px-2" style="font-size: 0.65rem;">{{ __('MEASURE NOW!') }}</span>
+                                            <span class="badge bg-warning text-dark py-1 px-2" style="font-size: 0.65rem;">{{ __('MEASURE') }}</span>
                                         @else
                                             <span class="badge rounded-pill bg-body text-primary border border-primary-subtle py-1 px-2" style="font-size: 0.6rem;">{{ __('MEASURE') }}</span>
                                         @endif
@@ -211,7 +254,7 @@
             </a>
         @empty
             <div class="text-center py-5">
-                <p class="text-muted small">{{ __('No entries today') }}</p>
+                <p class="text-muted small">{{ __('No entries found with the selected filters') }}</p>
             </div>
         @endforelse
     </div>

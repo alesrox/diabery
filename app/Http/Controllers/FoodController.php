@@ -14,8 +14,10 @@ class FoodController extends Controller {
     public function store(Request $request) {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'carbs_100g' => 'required|numeric|min:0',
+            'quantity' => 'required|numeric|min:0',
+            'measure_type' => 'required|in:grams,units',
         ]);
+
 
         auth()->user()->foods()->create($validated);
 
